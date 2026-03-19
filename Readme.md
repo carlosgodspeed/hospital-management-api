@@ -22,8 +22,6 @@ O sistema permite gerenciar pacientes, médicos, compromissos e autenticação p
 - **Maven**  
 - **MySQL 8**  
 - **Spring Data JPA**  
-- **Lombok** (opcional, para reduzir boilerplate)  
-- **Swagger/OpenAPI**  
 
 ## Estrutura do projeto
 ```
