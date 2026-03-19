@@ -4,7 +4,6 @@
 ![Spring Boot](https://img.shields.io/badge/SpringBoot-3.x-green)
 ![Maven](https://img.shields.io/badge/Maven-Build-red)
 ![MySQL](https://img.shields.io/badge/MySQL-8-blue)
-![Swagger](https://img.shields.io/badge/Swagger-Documentation-yellow)
 
 ## Sobre o projeto
 API de gerenciamento hospitalar desenvolvida em **Java 17** com **Spring Boot**, utilizando **MySQL** para persistência de dados.  
