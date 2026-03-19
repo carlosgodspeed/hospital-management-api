@@ -1,0 +1,16 @@
+package hospital.system.repository;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import hospital.system.model.Compromisso;
+
+@Repository
+public interface CompromissoRepository extends JpaRepository<Compromisso, Long> {
+
+    List<Compromisso> findByMedicoIdAndData(Long medicoId, LocalDate data);
+    List<Compromisso> findByPacienteId(Long pacienteId);
+}
