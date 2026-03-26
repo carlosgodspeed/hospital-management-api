@@ -10,12 +10,78 @@
 API de gerenciamento hospitalar desenvolvida em **Java 17** com **Spring Boot**, utilizando **MySQL** para persistência de dados.  
 O sistema permite gerenciar pacientes, médicos, compromissos e autenticação para diferentes perfis (admin, médico e paciente).
 
-## Funcionalidades
-- Cadastro de pacientes e médicos  
-- Consulta e agendamento de compromissos  
-- Autenticação por perfis (admin, médico e paciente)  
-- Listagem e pesquisa de pacientes e médicos  
-- Documentação de API com Swagger  
+## ✅ Funcionalidades IMPLEMENTADAS
+
+### 👤 Pacientes
+- Cadastro de pacientes  
+- Listagem de pacientes  
+- Persistência no banco MySQL  
+
+### 🩺 Médicos
+- Cadastro de médicos  
+- Listagem de médicos  
+- Associação com compromissos  
+
+### 📅 Compromissos (Agendamentos)
+- Criação de compromissos  
+- Listagem geral  
+- Busca por:
+  - médico + data  
+  - paciente  
+- Remarcação de consulta (data e hora)  
+- Atualização de status:
+  - AGENDADO  
+  - CONFIRMADO  
+  - CANCELADO  
+
+### 🗄️ Banco de Dados
+- Modelagem relacional com:
+  - `pacientes`
+  - `medicos`
+  - `compromissos`
+  - `usuarios`
+- Relacionamentos com JPA (ManyToOne)
+- Controle de status e última alteração no compromisso  
+
+### 🔐 Usuários (Base criada)
+- Estrutura de usuários implementada  
+- Suporte a perfis:
+  - ADMIN  
+  - MEDICO  
+  - PACIENTE  
+
+---
+
+## 🚧 Funcionalidades EM DESENVOLVIMENTO
+
+### 🔐 Autenticação
+- Login de usuário  
+- Validação de credenciais  
+- (Próximo passo) JWT para autenticação segura  
+
+### 🛡️ Controle de acesso
+- Permissões por perfil:
+  - Admin
+  - Médico
+  - Paciente  
+
+### 📅 Regras de negócio
+- Bloqueio de conflitos de horário  
+- Validação de agenda médica  
+- Limite de agendamentos por período  
+
+### 🔔 Notificações
+- Aviso de remarcação de consulta  
+- Confirmação de agendamento  
+- (Futuro) envio por e-mail ou sistema interno  
+
+### 🌐 Integração com Front-end
+- Interface para:
+  - pacientes acompanharem consultas  
+  - médicos gerenciarem agenda  
+  - admin controlar o sistema  
+
+---
 
 ## Tecnologias utilizadas
 - **Java 17**  
@@ -23,7 +89,6 @@ O sistema permite gerenciar pacientes, médicos, compromissos e autenticação p
 - **Maven**  
 - **MySQL 8**  
 - **Spring Data JPA**  
-- **Lombok** (opcional, para reduzir boilerplate)  
 - **Swagger/OpenAPI**  
 
 ## Estrutura do projeto
@@ -37,18 +102,22 @@ hospital-management/
 │     │     │  ├─ CompromissoController.java
 │     │     │  ├─ MedicoController.java
 │     │     │  └─ PacienteController.java
+│     │     │  └─ UsuarioController.java
 │     │     ├─ model/
 │     │     │  ├─ Compromisso.java
 │     │     │  ├─ Medico.java
 │     │     │  └─ Paciente.java
+│     │     │  └─ Usuario.java
 │     │     ├─ repository/
 │     │     │  ├─ CompromissoRepository.java
 │     │     │  ├─ MedicoRepository.java
 │     │     │  └─ PacienteRepository.java
+│     │     │  └─ UsuarioRepository.java
 │     │     ├─ service/
 │     │     │  ├─ CompromissoService.java
 │     │     │  ├─ MedicoService.java
 │     │     │  └─ PacienteService.java
+│     │     │  └─ UsuarioService.java
 │     │     └─ HospitalManagementApplication.java
 │     └─ resources/
 │        └─ application.properties
