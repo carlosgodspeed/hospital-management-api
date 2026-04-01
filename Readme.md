@@ -136,15 +136,88 @@ hospital-management/
 └─ pom.xml
 ```
 
-📈 Roadmap
- CRUD Pacientes
- CRUD Médicos
- CRUD Compromissos
- Status e remarcação
- Sistema de usuários
- Login (autenticação básica)
- JWT
- Controle de acesso
- Regras de agenda
- Notificações
- Front-end
+## 🗺️ Roadmap do Projeto
+
+### ✅ Fase 1 — Base do Sistema (Concluído)
+
+* [x] Estrutura inicial com Spring Boot
+* [x] Configuração do banco de dados MySQL
+* [x] Modelagem das entidades:
+
+  * Paciente
+  * Médico
+  * Compromisso
+  * Usuário
+* [x] Relacionamentos com JPA (ManyToOne)
+* [x] CRUD completo:
+
+  * Pacientes
+  * Médicos
+  * Compromissos
+* [x] Funcionalidades de agendamento:
+
+  * Criar consulta
+  * Listar consultas
+  * Buscar por médico e data
+  * Buscar por paciente
+  * Remarcar consulta
+  * Atualizar status (AGENDADO, CONFIRMADO, CANCELADO)
+
+---
+
+### 🔐 Fase 2 — Autenticação (Em andamento)
+
+* [x] Estrutura de usuários criada
+* [x] Endpoint de login básico
+* [x] Separação por perfis (ADMIN, MEDICO, PACIENTE)
+* [ ] Criptografia de senha (BCrypt)
+* [ ] Implementação de autenticação com JWT
+* [ ] Retorno de token no login
+* [ ] Validação de token nas requisições
+
+---
+
+### 🛡️ Fase 3 — Autorização e Segurança
+
+* [ ] Configuração do Spring Security
+* [ ] Controle de acesso por perfil:
+
+  * Admin → acesso total
+  * Médico → gerenciar agenda
+  * Paciente → visualizar consultas
+* [ ] Proteção de endpoints
+* [ ] Tratamento de erros de autenticação
+
+---
+
+### 📅 Fase 4 — Regras de Negócio
+
+* [ ] Bloqueio de conflitos de horário
+* [ ] Validação de agenda médica
+* [ ] Limite de consultas por período
+* [ ] Regras para cancelamento/remarcação
+* [ ] Validação de dados (DTO + Bean Validation)
+
+---
+
+### 🔔 Fase 5 — Notificações
+
+* [ ] Notificação ao criar consulta
+* [ ] Notificação ao remarcar
+* [ ] Notificação ao cancelar
+* [ ] (Futuro) Envio por e-mail
+* [ ] (Futuro) Sistema interno de notificações
+
+---
+
+### 🌐 Fase 7 — Integração com Front-end
+
+* [ ] Criar interface web (React ou HTML/CSS/JS)
+* [ ] Tela de login
+* [ ] Dashboard por perfil:
+
+  * Admin
+  * Médico
+  * Paciente
+* [ ] Consumo da API
+
