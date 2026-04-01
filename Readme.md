@@ -1,13 +1,18 @@
-# Hospital Management API
+# 🏥 Hospital Management API
 
 ![Java](https://img.shields.io/badge/Java-17-orange)
 ![Spring Boot](https://img.shields.io/badge/SpringBoot-3.x-green)
 ![Maven](https://img.shields.io/badge/Maven-Build-red)
 ![MySQL](https://img.shields.io/badge/MySQL-8-blue)
 
-## Sobre o projeto
-API de gerenciamento hospitalar desenvolvida em **Java 17** com **Spring Boot**, utilizando **MySQL** para persistência de dados.  
-O sistema permite gerenciar pacientes, médicos, compromissos e autenticação para diferentes perfis (admin, médico e paciente).
+---
+
+## 📌 Sobre o projeto
+API REST de gerenciamento hospitalar desenvolvida com **Java 17 + Spring Boot**, focada em boas práticas de backend e arquitetura limpa.
+
+O sistema permite gerenciar pacientes, médicos e compromissos, além de possuir **autenticação de usuários com diferentes perfis (ADMIN, MÉDICO e PACIENTE)**.
+
+---
 
 ## ✅ Funcionalidades IMPLEMENTADAS
 
@@ -33,6 +38,12 @@ O sistema permite gerenciar pacientes, médicos, compromissos e autenticação p
   - CONFIRMADO  
   - CANCELADO  
 
+### 🔐 Autenticação
+- Login de usuário  
+- Validação de credenciais  
+- Retorno seguro com DTO (sem exposição de senha)  
+- Estrutura preparada para JWT  
+
 ### 🗄️ Banco de Dados
 - Modelagem relacional com:
   - `pacientes`
@@ -42,9 +53,9 @@ O sistema permite gerenciar pacientes, médicos, compromissos e autenticação p
 - Relacionamentos com JPA (ManyToOne)
 - Controle de status e última alteração no compromisso  
 
-### 🔐 Usuários (Base criada)
-- Estrutura de usuários implementada  
-- Suporte a perfis:
+### 👥 Usuários
+- Sistema de usuários implementado  
+- Perfis suportados:
   - ADMIN  
   - MEDICO  
   - PACIENTE  
@@ -53,32 +64,25 @@ O sistema permite gerenciar pacientes, médicos, compromissos e autenticação p
 
 ## 🚧 Funcionalidades EM DESENVOLVIMENTO
 
-### 🔐 Autenticação
-- Login de usuário  
-- Validação de credenciais  
-- (Próximo passo) JWT para autenticação segura  
-
-### 🛡️ Controle de acesso
-- Permissões por perfil:
-  - Admin
-  - Médico
-  - Paciente  
+### 🔐 Segurança
+- Autenticação com JWT  
+- Proteção de rotas  
+- Controle de acesso por perfil (role-based access)  
 
 ### 📅 Regras de negócio
 - Bloqueio de conflitos de horário  
-- Validação de agenda médica  
-- Limite de agendamentos por período  
+- Validação de disponibilidade do médico  
+- Restrição de horários inválidos  
 
 ### 🔔 Notificações
 - Aviso de remarcação de consulta  
 - Confirmação de agendamento  
 - (Futuro) envio por e-mail ou sistema interno  
 
-### 🌐 Integração com Front-end
-- Interface para:
-  - pacientes acompanharem consultas  
-  - médicos gerenciarem agenda  
-  - admin controlar o sistema  
+### 🌐 Front-end
+- Interface para pacientes acompanharem consultas  
+- Painel para médicos gerenciarem agenda  
+- Painel administrativo  
 
 ---
 
@@ -88,10 +92,13 @@ O sistema permite gerenciar pacientes, médicos, compromissos e autenticação p
 - **Maven**  
 - **MySQL 8**  
 - **Spring Data JPA**  
-- **Lombok** (opcional, para reduzir boilerplate)  
-- **Swagger/OpenAPI**  
+- **Spring Web**  
+- **Lombok** (presente no projeto, mas ainda não utilizado)
 
-## Estrutura do projeto
+---
+
+## 📁 Estrutura do projeto
+
 ```
 hospital-management/
 ├─ src/
@@ -99,10 +106,14 @@ hospital-management/
 │     ├─ java/
 │     │  └─ hospital/system/
 │     │     ├─ controller/
+│     │     │  ├─ AuthController.java
 │     │     │  ├─ CompromissoController.java
 │     │     │  ├─ MedicoController.java
 │     │     │  └─ PacienteController.java
 │     │     │  └─ UsuarioController.java
+│     │     ├─ dto/
+│     │     │  └─ LoginRequest.java
+│     │     │  └─ LoginResponse.java
 │     │     ├─ model/
 │     │     │  ├─ Compromisso.java
 │     │     │  ├─ Medico.java
@@ -114,6 +125,7 @@ hospital-management/
 │     │     │  └─ PacienteRepository.java
 │     │     │  └─ UsuarioRepository.java
 │     │     ├─ service/
+│     │     │  ├─ AuthService.java
 │     │     │  ├─ CompromissoService.java
 │     │     │  ├─ MedicoService.java
 │     │     │  └─ PacienteService.java
@@ -123,3 +135,16 @@ hospital-management/
 │        └─ application.properties
 └─ pom.xml
 ```
+
+📈 Roadmap
+ CRUD Pacientes
+ CRUD Médicos
+ CRUD Compromissos
+ Status e remarcação
+ Sistema de usuários
+ Login (autenticação básica)
+ JWT
+ Controle de acesso
+ Regras de agenda
+ Notificações
+ Front-end
