@@ -133,6 +133,10 @@ hospital-management/
 │     │     │  ├─ MedicoRepository.java
 │     │     │  └─ PacienteRepository.java
 │     │     │  └─ UsuarioRepository.java
+│     │     ├─ security/
+|     |     |  └─ JwtFilter.java
+|     |     |  └─ JwtUtil.java
+|     |     |  └─ SecurityConfig.java
 │     │     ├─ service/
 │     │     │  ├─ AuthService.java
 │     │     │  ├─ CompromissoService.java
