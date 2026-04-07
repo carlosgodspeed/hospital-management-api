@@ -1,14 +1,10 @@
 package hospital.system.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import hospital.system.dto.LoginRequest;
 import hospital.system.dto.LoginResponse;
-import hospital.system.model.Usuario;
 import hospital.system.service.AuthService;
 
 @RestController
@@ -23,12 +19,10 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-        Usuario usuario = service.login(request.getUsername(), request.getPassword());
 
-        LoginResponse response = new LoginResponse(
-                usuario.getId(),
-                usuario.getUsername(),
-                usuario.getRole().name()
+        LoginResponse response = service.login(
+                request.getUsername(),
+                request.getPassword()
         );
 
         return ResponseEntity.ok(response);

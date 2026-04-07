@@ -38,11 +38,14 @@ O sistema permite gerenciar pacientes, médicos e compromissos, além de possuir
   - CONFIRMADO  
   - CANCELADO  
 
-### 🔐 Autenticação
+### 🔐 Autenticação e Segurança
 - Login de usuário  
 - Validação de credenciais  
-- Retorno seguro com DTO (sem exposição de senha)  
-- Estrutura preparada para JWT  
+- Geração de token JWT  
+- Validação de token nas requisições  
+- Proteção de rotas com Spring Security  
+- Filtro de autenticação (JWT Filter)  
+- Retorno seguro (sem exposição de senha)  
 
 ### 🗄️ Banco de Dados
 - Modelagem relacional com:
@@ -65,9 +68,13 @@ O sistema permite gerenciar pacientes, médicos e compromissos, além de possuir
 ## 🚧 Funcionalidades EM DESENVOLVIMENTO
 
 ### 🔐 Segurança
-- Autenticação com JWT  
-- Proteção de rotas  
+- Criptografia de senha com BCrypt  
 - Controle de acesso por perfil (role-based access)  
+- Refresh Token  
+
+### 👤 Usuários
+- Vínculo entre usuário e paciente  
+- Endpoint para usuário logado (`/me`)  
 
 ### 📅 Regras de negócio
 - Bloqueio de conflitos de horário  
@@ -89,11 +96,13 @@ O sistema permite gerenciar pacientes, médicos e compromissos, além de possuir
 ## Tecnologias utilizadas
 - **Java 17**  
 - **Spring Boot 3.x**  
+- **Spring Security**  
+- **JWT (JSON Web Token)**  
 - **Maven**  
 - **MySQL 8**  
 - **Spring Data JPA**  
 - **Spring Web**  
-- **Lombok** (presente no projeto, mas ainda não utilizado)
+- **Lombok**  
 
 ---
 
@@ -136,56 +145,41 @@ hospital-management/
 └─ pom.xml
 ```
 
+
+---
+
 ## 🗺️ Roadmap do Projeto
 
 ### ✅ Fase 1 — Base do Sistema (Concluído)
 
 * [x] Estrutura inicial com Spring Boot
 * [x] Configuração do banco de dados MySQL
-* [x] Modelagem das entidades:
-
-  * Paciente
-  * Médico
-  * Compromisso
-  * Usuário
-* [x] Relacionamentos com JPA (ManyToOne)
-* [x] CRUD completo:
-
-  * Pacientes
-  * Médicos
-  * Compromissos
-* [x] Funcionalidades de agendamento:
-
-  * Criar consulta
-  * Listar consultas
-  * Buscar por médico e data
-  * Buscar por paciente
-  * Remarcar consulta
-  * Atualizar status (AGENDADO, CONFIRMADO, CANCELADO)
+* [x] Modelagem das entidades
+* [x] Relacionamentos com JPA
+* [x] CRUD completo
+* [x] Sistema de agendamentos
 
 ---
 
-### 🔐 Fase 2 — Autenticação (Em andamento)
+### 🔐 Fase 2 — Autenticação (Concluído)
 
-* [x] Estrutura de usuários criada
-* [x] Endpoint de login básico
-* [x] Separação por perfis (ADMIN, MEDICO, PACIENTE)
+* [x] Estrutura de usuários
+* [x] Endpoint de login
+* [x] Separação por perfis
+* [x] Geração de token JWT
+* [x] Validação de token
+* [x] Proteção de rotas com Spring Security
+
+---
+
+### 🛡️ Fase 3 — Autorização e Segurança (Em andamento)
+
 * [ ] Criptografia de senha (BCrypt)
-* [ ] Implementação de autenticação com JWT
-* [ ] Retorno de token no login
-* [ ] Validação de token nas requisições
-
----
-
-### 🛡️ Fase 3 — Autorização e Segurança
-
-* [ ] Configuração do Spring Security
 * [ ] Controle de acesso por perfil:
-
   * Admin → acesso total
   * Médico → gerenciar agenda
   * Paciente → visualizar consultas
-* [ ] Proteção de endpoints
+* [ ] Proteção avançada de endpoints
 * [ ] Tratamento de erros de autenticação
 
 ---
@@ -202,22 +196,15 @@ hospital-management/
 
 ### 🔔 Fase 5 — Notificações
 
-* [ ] Notificação ao criar consulta
-* [ ] Notificação ao remarcar
-* [ ] Notificação ao cancelar
-* [ ] (Futuro) Envio por e-mail
-* [ ] (Futuro) Sistema interno de notificações
+* [ ] Notificações de eventos de consulta
+* [ ] Integração futura com e-mail
 
 ---
 
-### 🌐 Fase 7 — Integração com Front-end
+### 🌐 Fase 6 — Integração com Front-end
 
-* [ ] Criar interface web (React ou HTML/CSS/JS)
-* [ ] Tela de login
-* [ ] Dashboard por perfil:
-
-  * Admin
-  * Médico
-  * Paciente
+* [ ] Interface web
+* [ ] Login e autenticação
+* [ ] Dashboard por perfil
 * [ ] Consumo da API
 

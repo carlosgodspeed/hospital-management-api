@@ -4,26 +4,38 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import hospital.system.dto.LoginResponse;
 import hospital.system.model.Usuario;
 import hospital.system.repository.UsuarioRepository;
+import hospital.system.security.JwtUtil;
 
 @Service
 public class AuthService {
 
     private final UsuarioRepository repository;
+    private final JwtUtil jwtUtil;
 
-    public AuthService(UsuarioRepository repository) {
+    public AuthService(UsuarioRepository repository, JwtUtil jwtUtil) {
         this.repository = repository;
+        this.jwtUtil = jwtUtil;
     }
 
-    public Usuario login(String username, String password) {
+    public LoginResponse login(String username, String password) {
         Optional<Usuario> usuarioOpt = repository.findByUsername(username);
 
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();
 
             if (usuario.getPassword().equals(password)) {
-                return usuario;
+
+                String token = jwtUtil.generateToken(usuario.getUsername());
+
+                return new LoginResponse(
+                    token,
+                    usuario.getId(),
+                    usuario.getUsername(),
+                    usuario.getRole().name()
+                );
             }
         }
 
