@@ -5,6 +5,7 @@ import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -31,6 +32,13 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
+        // 🔥 IGNORA ROTA DE LOGIN
+        String path = request.getRequestURI();
+        if (path.startsWith("/api/auth")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         final String authHeader = request.getHeader("Authorization");
 
         String username = null;
@@ -46,12 +54,15 @@ public class JwtFilter extends OncePerRequestFilter {
             Usuario usuario = usuarioRepository.findByUsername(username)
                     .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-            // 🔥 AQUI É O QUE FALTAVA
+            var authorities = Collections.singletonList(
+                    new SimpleGrantedAuthority("ROLE_" + usuario.getRole().name())
+            );
+
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(
                             usuario.getUsername(),
                             null,
-                            Collections.emptyList()
+                            authorities
                     );
 
             SecurityContextHolder.getContext().setAuthentication(authToken);
