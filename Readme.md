@@ -178,7 +178,6 @@ hospital-management/
 
 ### 🛡️ Fase 3 — Autorização e Segurança (Em andamento)
 
-* [ ] Criptografia de senha (BCrypt)
 * [ ] Controle de acesso por perfil:
   * Admin → acesso total
   * Médico → gerenciar agenda
