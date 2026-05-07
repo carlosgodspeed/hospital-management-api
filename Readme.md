@@ -137,6 +137,7 @@ hospital-management/
 |     |     |  └─ JwtFilter.java
 |     |     |  └─ JwtUtil.java
 |     |     |  └─ SecurityConfig.java
+|     |     |  └─ SecurityExceptionHandler.java
 │     │     ├─ service/
 │     │     │  ├─ AuthService.java
 │     │     │  ├─ CompromissoService.java
