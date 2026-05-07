@@ -2,6 +2,7 @@ package hospital.system.service;
 
 import java.util.Optional;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import hospital.system.dto.LoginResponse;
@@ -14,10 +15,12 @@ public class AuthService {
 
     private final UsuarioRepository repository;
     private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthService(UsuarioRepository repository, JwtUtil jwtUtil) {
+    public AuthService(UsuarioRepository repository, JwtUtil jwtUtil, PasswordEncoder passwordEncoder) {
         this.repository = repository;
         this.jwtUtil = jwtUtil;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public LoginResponse login(String username, String password) {
@@ -26,15 +29,16 @@ public class AuthService {
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();
 
-            if (usuario.getPassword().equals(password)) {
+            //  valida senha criptografada
+            if (passwordEncoder.matches(password, usuario.getPassword())) {
 
                 String token = jwtUtil.generateToken(usuario.getUsername());
 
                 return new LoginResponse(
-                    token,
-                    usuario.getId(),
-                    usuario.getUsername(),
-                    usuario.getRole().name()
+                        token,
+                        usuario.getId(),
+                        usuario.getUsername(),
+                        usuario.getRole().name()
                 );
             }
         }
