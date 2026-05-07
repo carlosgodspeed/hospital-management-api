@@ -2,6 +2,7 @@ package hospital.system.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,9 +14,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
+    private final SecurityExceptionHandler securityExceptionHandler;
 
-    public SecurityConfig(JwtFilter jwtFilter) {
+    public SecurityConfig(
+            JwtFilter jwtFilter,
+            SecurityExceptionHandler securityExceptionHandler) {
+
         this.jwtFilter = jwtFilter;
+        this.securityExceptionHandler = securityExceptionHandler;
     }
 
     @Bean
@@ -23,29 +29,34 @@ public class SecurityConfig {
 
         http
             .csrf(csrf -> csrf.disable())
+
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
+
+            .exceptionHandling(exception ->
+                exception.accessDeniedHandler(securityExceptionHandler)
+            )
+
             .authorizeHttpRequests(auth -> auth
 
-                // ROTAS LIVRES
                 .requestMatchers("/api/auth/**").permitAll()
 
-                // ADMIN
-                .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
+                .requestMatchers("/api/usuarios/**")
+                .hasRole("ADMIN")
 
-                // MÉDICO
-                .requestMatchers("/api/medicos/**").hasAnyRole("ADMIN", "MEDICO")
+                .requestMatchers("/api/medicos/**")
+                .hasAnyRole("ADMIN", "MEDICO")
 
-                // PACIENTE
-                .requestMatchers("/api/pacientes/**").hasAnyRole("ADMIN", "PACIENTE")
+                .requestMatchers("/api/pacientes/**")
+                .hasAnyRole("ADMIN", "PACIENTE")
 
-                // COMPROMISSOS (qualquer autenticado)
-                .requestMatchers("/api/compromissos/**").authenticated()
+                .requestMatchers("/api/compromissos/**")
+                .hasAnyRole("ADMIN", "MEDICO", "PACIENTE")
 
-                // QUALQUER OUTRA
                 .anyRequest().authenticated()
             )
+
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

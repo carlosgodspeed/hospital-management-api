@@ -49,13 +49,14 @@ public class JwtFilter extends OncePerRequestFilter {
             username = jwtUtil.extractUsername(token);
         }
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (username != null &&
+            SecurityContextHolder.getContext().getAuthentication() == null) {
 
             Usuario usuario = usuarioRepository.findByUsername(username)
                     .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
             var authorities = Collections.singletonList(
-                    new SimpleGrantedAuthority("ROLE_" + usuario.getRole().name())
+                new SimpleGrantedAuthority("ROLE_" + usuario.getRole().name())
             );
 
             UsernamePasswordAuthenticationToken authToken =

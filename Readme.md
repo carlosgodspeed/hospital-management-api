@@ -176,14 +176,14 @@ hospital-management/
 
 ---
 
-### 🛡️ Fase 3 — Autorização e Segurança (Em andamento)
+### 🛡️ Fase 3 — Autorização e Segurança (Concluido)
 
-* [ ] Controle de acesso por perfil:
+* [x] Controle de acesso por perfil:
   * Admin → acesso total
   * Médico → gerenciar agenda
   * Paciente → visualizar consultas
-* [ ] Proteção avançada de endpoints
-* [ ] Tratamento de erros de autenticação
+* [x] Proteção avançada de endpoints
+* [x] Tratamento de erros de autenticação
 
 ---
 
