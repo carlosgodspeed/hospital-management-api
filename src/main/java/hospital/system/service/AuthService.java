@@ -24,12 +24,13 @@ public class AuthService {
     }
 
     public LoginResponse login(String username, String password) {
+
         Optional<Usuario> usuarioOpt = repository.findByUsername(username);
 
         if (usuarioOpt.isPresent()) {
+
             Usuario usuario = usuarioOpt.get();
 
-            //  valida senha criptografada
             if (passwordEncoder.matches(password, usuario.getPassword())) {
 
                 String token = jwtUtil.generateToken(usuario.getUsername());

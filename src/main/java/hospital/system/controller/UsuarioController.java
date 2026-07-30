@@ -1,7 +1,5 @@
 package hospital.system.controller;
 
-import java.util.Optional;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,19 +18,16 @@ public class UsuarioController {
     public UsuarioController(UsuarioService service) {
         this.service = service;
     }
-    // Criar usuário
+
+    // Criar usuário (senha é criptografada com BCrypt dentro do UsuarioService)
     @PostMapping
     public ResponseEntity<Usuario> criar(@RequestBody Usuario usuario) {
         return ResponseEntity.ok(service.salvar(usuario));
     }
-    // Login simples
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Usuario usuario) {
-        Optional<Usuario> user = service.buscarPorUsername(usuario.getUsername());
 
-        if(user.isPresent() && user.get().getPassword().equals(usuario.getPassword())) {
-            return ResponseEntity.ok(user.get());
-        }
-        return ResponseEntity.status(401).body("Usuário ou senha inválidos");
-    }
+    // O login foi centralizado em /api/auth/login (AuthController + AuthService),
+    // que usa PasswordEncoder.matches() para comparar a senha com o hash salvo.
+    // O endpoint duplicado que existia aqui foi removido: além de nunca funcionar
+    // (comparava a senha em texto puro com o hash BCrypt), ficava bloqueado pela
+    // própria SecurityConfig, que exige ROLE_ADMIN para tudo em /api/usuarios/**.
 }
