@@ -33,12 +33,12 @@ Desenvolver uma plataforma robusta e escalável para gerenciamento de consultas 
 
 **Backend:**
 
-- Java 17+
-- Spring Boot 3.x
-- Spring Data JPA
-- Spring Security
+- Java 17
+- Spring Boot 3.2.5
+- Spring Data JPA (Hibernate)
+- Spring Security + JWT (jjwt)
 - MySQL 8.x
-- Bean Validation
+- BCrypt para hash de senhas
 
 **Frontend (em desenvolvimento):**
 
@@ -49,9 +49,9 @@ Desenvolver uma plataforma robusta e escalável para gerenciamento de consultas 
 
 - Arquitetura em camadas bem definida
 - Sistema de autorização baseado em perfis
-- Modelagem de domínio rica com relacionamentos JPA
+- Modelagem de domínio com relacionamentos JPA
 - API RESTful seguindo boas práticas
-- Preparado para escalabilidade horizontal
+- Tratamento de erros centralizado (`@RestControllerAdvice`)
 - Design system validado em protótipos Figma
 
 ---
@@ -59,40 +59,48 @@ Desenvolver uma plataforma robusta e escalável para gerenciamento de consultas 
 ## 📁 Estrutura do projeto
 
 ```
-hospital-management/
+hospital-management-api/
+├─ database/
+│  └─ schema.sql
 ├─ src/
 │  └─ main/
 │     ├─ java/
 │     │  └─ hospital/system/
+│     │     ├─ config/
+│     │     │  └─ DataInitializer.java
 │     │     ├─ controller/
 │     │     │  ├─ AuthController.java
 │     │     │  ├─ CompromissoController.java
 │     │     │  ├─ MedicoController.java
-│     │     │  └─ PacienteController.java
+│     │     │  ├─ PacienteController.java
 │     │     │  └─ UsuarioController.java
 │     │     ├─ dto/
-│     │     │  └─ LoginRequest.java
+│     │     │  ├─ LoginRequest.java
 │     │     │  └─ LoginResponse.java
+│     │     ├─ exception/
+│     │     │  └─ GlobalExceptionHandler.java
 │     │     ├─ model/
 │     │     │  ├─ Compromisso.java
 │     │     │  ├─ Medico.java
-│     │     │  └─ Paciente.java
+│     │     │  ├─ Paciente.java
+│     │     │  ├─ Role.java
 │     │     │  └─ Usuario.java
 │     │     ├─ repository/
 │     │     │  ├─ CompromissoRepository.java
 │     │     │  ├─ MedicoRepository.java
-│     │     │  └─ PacienteRepository.java
+│     │     │  ├─ PacienteRepository.java
 │     │     │  └─ UsuarioRepository.java
 │     │     ├─ security/
-|     |     |  └─ JwtFilter.java
-|     |     |  └─ JwtUtil.java
-|     |     |  └─ SecurityConfig.java
-|     |     |  └─ SecurityExceptionHandler.java
+│     │     │  ├─ JwtFilter.java
+│     │     │  ├─ JwtUtil.java
+│     │     │  ├─ SecurityConfig.java
+│     │     │  └─ SecurityExceptionHandler.java
 │     │     ├─ service/
 │     │     │  ├─ AuthService.java
 │     │     │  ├─ CompromissoService.java
 │     │     │  ├─ MedicoService.java
-│     │     │  └─ PacienteService.java
+│     │     │  ├─ NotificacaoService.java
+│     │     │  ├─ PacienteService.java
 │     │     │  └─ UsuarioService.java
 │     │     └─ HospitalManagementApplication.java
 │     └─ resources/
@@ -124,36 +132,30 @@ hospital-management/
 
 **Responsabilidade:** Expor endpoints REST, validar entradas, retornar respostas HTTP adequadas.
 
-**Características:**
+**Endpoints principais:**
 
-- Anotações `@RestController`
-- Validação com Bean Validation (`@Valid`)
-- Tratamento de exceções centralizado
-- DTOs para entrada/saída de dados
-
-**Exemplo de endpoints:**
-
-- `POST /api/compromissos` - Criar consulta
-- `GET /api/compromissos/{id}` - Buscar consulta
-- `PUT /api/compromissos/{id}` - Atualizar consulta
-- `DELETE /api/compromissos/{id}` - Cancelar consulta
+- `POST /api/auth/login` — Login e geração de token JWT
+- `POST /api/usuarios` — Criar usuário (ADMIN)
+- `POST /api/medicos` · `GET /api/medicos` · `GET /api/medicos/{id}` · `DELETE /api/medicos/{id}`
+- `POST /api/pacientes` · `GET /api/pacientes` · `GET /api/pacientes/{id}` · `DELETE /api/pacientes/{id}`
+- `POST /api/compromissos` — Criar consulta
+- `GET /api/compromissos` — Listar todas
+- `GET /api/compromissos/medico/{medicoId}?data=` — Buscar por médico e data
+- `GET /api/compromissos/paciente/{pacienteId}` — Buscar por paciente
+- `PUT /api/compromissos/{id}/status` — Atualizar status
+- `PUT /api/compromissos/{id}/remarcar` — Remarcar consulta
 
 ### Service Layer
 
 **Responsabilidade:** Implementar regras de negócio, orquestrar operações, validar consistência de dados.
 
-**Funções principais:**
+**Implementado:**
 
-- Validação de conflitos de horário (planejado)
-- Verificação de disponibilidade médica (planejado)
-- Aplicação de regras de cancelamento (planejado)
-- Coordenação entre múltiplas entidades
+- Bloqueio de conflitos de horário (`existsByMedicoIdAndDataAndHora`)
+- Notificação (via log) ao remarcar ou mudar status de um compromisso
+- Proteção contra exclusão de médico/paciente com compromissos vinculados
 
 ### Repository Layer
-
-**Responsabilidade:** Abstração de acesso a dados usando Spring Data JPA.
-
-**Implementações:**
 
 - `PacienteRepository`
 - `MedicoRepository`
@@ -164,8 +166,8 @@ hospital-management/
 
 - Busca por médico e data
 - Busca por paciente
-- Filtros de status
-- Consultas por período
+- Verificação de horário ocupado
+- Verificação de vínculo com compromissos (para exclusão segura)
 
 ### Entity Layer
 
@@ -175,31 +177,46 @@ hospital-management/
 
 | Entidade | Atributos Chave | Relacionamentos |
 | --- | --- | --- |
-| **Paciente** | CPF, nome, telefone, email | `@OneToMany` com Compromisso |
-| **Medico** | CRM, especialidade | `@OneToMany` com Compromisso |
-| **Compromisso** | dataHora, status, observacoes | `@ManyToOne` com Paciente e Medico |
-| **Usuario** | login, senha, perfil | - |
+| **Usuario** | username (único), password (BCrypt), role | — |
+| **Medico** | nome, especialidade | `@OneToOne` com Usuario |
+| **Paciente** | nome, email, telefone | `@OneToOne` com Usuario |
+| **Compromisso** | data, hora, status | `@ManyToOne` com Paciente e Medico |
 
 ### Security Layer
 
 **Fluxo de Autenticação:**
 
-1. Cliente envia credenciais para `/api/login`
-2. Sistema valida usuário e senha
+1. Cliente envia credenciais para `POST /api/auth/login`
+2. Sistema valida a senha com `PasswordEncoder.matches()` (BCrypt)
 3. Token JWT é gerado e retornado
-4. Cliente inclui token em requisições subsequentes
-5. Filtro de segurança valida token e perfil
-6. Acesso é concedido ou negado baseado em permissões
+4. Cliente inclui o token (`Authorization: Bearer <token>`) em requisições subsequentes
+5. `JwtFilter` valida o token e popula o contexto de segurança com a role do usuário
+6. `SecurityConfig` concede ou nega acesso com base na role
 
-**Controle de Acesso:**
+**Controle de Acesso por recurso (`SecurityConfig`):**
 
-| Endpoint | ADMIN | MEDICO | PACIENTE |
+| Rota | ADMIN | MEDICO | PACIENTE |
 | --- | --- | --- | --- |
-| Criar usuários | ✓ | ✗ | ✗ |
-| Visualizar todas consultas | ✓ | ✗ | ✗ |
-| Visualizar próprias consultas | ✓ | ✓ | ✓ |
-| Agendar consulta | ✓ | ✗ | ✓ |
-| Confirmar consulta | ✓ | ✓ | ✗ |
+| `/api/auth/**` | público | público | público |
+| `/api/usuarios/**` | ✓ | ✗ | ✗ |
+| `/api/medicos/**` | ✓ | ✓ | ✗ |
+| `/api/pacientes/**` | ✓ | ✗ | ✓ |
+| `/api/compromissos/**` | ✓ | ✓ | ✓ |
+
+> A permissão hoje é por recurso, não por ação — por exemplo, um MEDICO pode criar e excluir médicos, não apenas visualizar. Refinar isso por verbo HTTP é um próximo passo natural (ver Fase 4).
+
+---
+
+## 🛠️ Changelog — correções recentes
+
+O projeto passou por uma rodada de correção de bugs que impediam seu funcionamento:
+
+- **Login nunca autenticava.** A senha era comparada em texto puro contra o hash BCrypt salvo no banco. Corrigido para usar `PasswordEncoder.matches()`.
+- **Criação de usuário sempre falhava com `rawPassword cannot be null`.** O campo `password` em `Usuario` usava `@JsonIgnore`, que bloqueia tanto a saída quanto a entrada de dados — a senha nunca chegava ao servidor. Trocado por `@JsonProperty(access = WRITE_ONLY)`.
+- **Exclusão de médico/paciente com compromisso vinculado quebrava o sistema** (`JpaObjectRetrievalFailureException`). Agora bloqueada com validação que retorna `409 Conflict` e mensagem clara.
+- **Endpoint de login duplicado e inacessível** em `/api/usuarios/login` foi removido; o login é centralizado em `/api/auth/login`.
+- **Tratamento de erros centralizado adicionado** (`GlobalExceptionHandler`), trocando stacktraces em respostas 500 por JSON de erro consistente.
+- **Segredos movidos para variáveis de ambiente** (`DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`), removendo credenciais fixas do código.
 
 ---
 
@@ -207,217 +224,44 @@ hospital-management/
 
 ### ✅ Fase 1 — Base do Sistema (Concluído)
 
-**Objetivo Técnico:** Estabelecer fundação arquitetural e operações CRUD básicas.
-
-**O que foi implementado:**
-
-- Configuração do projeto Spring Boot com dependências essenciais
-- Conexão com MySQL via Spring Data JPA
-- Modelagem completa de entidades:
-    - `Paciente` com validações de CPF e dados pessoais
-    - `Medico` com CRM e especialidade
-    - `Compromisso` com relacionamentos bidirecionais
-    - `Usuario` com estrutura para autenticação
-- Repositories com queries derivadas e customizadas
-- CRUD completo para todas entidades
-- Sistema de agendamento básico com operações:
-    - Criação de consultas
-    - Listagem geral
-    - Busca por médico e data
-    - Busca por paciente
-    - Remarcação de consultas
-    - Atualização de status (Agendada, Confirmada, Cancelada, Concluída)
-
-**Impacto no Sistema:**
-
-Criação da estrutura base que suporta todas as funcionalidades futuras. Estabelecimento de padrões de código e organização de pacotes que facilitam manutenção e evolução.
-
-**Decisões Técnicas Tomadas:**
-
-- Uso de JPA para abstração de persistência
-- Relacionamentos bidirecionais para facilitar navegação entre entidades
-- Enumerações para status de compromissos (type-safe)
-- Separação clara entre camadas desde o início
-
-**O que ainda falta:**
-
-Nenhuma pendência nesta fase. Base sólida estabelecida.
-
----
+CRUD completo de Paciente, Médico, Usuario e Compromisso, com relacionamentos JPA e queries customizadas (busca por médico/data, por paciente, verificação de horário ocupado).
 
 ### ✅ Fase 2 — Autenticação (Concluído)
 
-**Objetivo Técnico:** Implementar sistema de identificação de usuários com suporte a múltiplos perfis.
-
-**O que foi implementado:**
-
-- Entidade `Usuario` com campos login e senha
-- Enum `Perfil` com três níveis: ADMIN, MEDICO, PACIENTE
-- Endpoint `POST /api/login` para autenticação
-- Geração de tokens JWT
-- Validação de credenciais contra banco de dados
-- Retorno de token com informações do perfil
-
-**Impacto no Sistema:**
-
-Implementação da primeira camada de segurança da aplicação, permitindo identificação segura de usuários e preparando a base para autorização por perfil. O sistema agora consegue autenticar usuários e fornecer tokens para acesso às funcionalidades protegidas.
-
-**Decisões Técnicas Tomadas:**
-
-- Uso de autenticação stateless com JWT para melhor escalabilidade
-- Separação entre autenticação e autorização
-- Uso de enums para controle de perfis
-- Preparação da entidade `Usuario` para integração com Spring Security
-- Estrutura preparada para expansão futura de permissões
-
-**O que ainda falta:**
-
-Nenhuma pendência crítica nesta fase. Estrutura de autenticação concluída.
-
----
+Login via `/api/auth/login`, geração de JWT, senha com hash BCrypt e verificação via `PasswordEncoder.matches()`.
 
 ### ✅ Fase 3 — Autorização e Segurança (Concluído)
 
-**Objetivo Técnico:**
-
-Implementar controle de acesso baseado em perfis e proteger endpoints críticos da API.
-
-**O que foi implementado:**
-
-- Configuração completa do Spring Security
-- Filtro JWT para interceptação de requisições
-- Validação automática de token em endpoints protegidos
-- Controle de acesso baseado em roles:
-    - `ADMIN` → acesso total ao sistema
-    - `MEDICO` → gerenciamento de agenda e consultas
-    - `PACIENTE` → visualização das próprias consultas
-- Configuração de rotas públicas e privadas
-- Tratamento global para:
-    - Token inválido
-    - Token expirado
-    - Usuário não autenticado
-    - Acesso negado
-
-**Impacto no Sistema:**
-
-O sistema passa a operar com segurança em nível de produção, garantindo que cada usuário acesse apenas recursos permitidos pelo seu perfil.
-
-**Decisões Técnicas Tomadas:**
-
-- Uso de filtros personalizados no Spring Security
-- Estratégia stateless para evitar sessões no servidor
-- Centralização de tratamento de erros de segurança
-- Uso de annotations para autorização declarativa
-
-**O que ainda falta:**
-
-Nenhuma pendência nesta fase.
-
----
+Spring Security + `JwtFilter` + controle de acesso por role (`ADMIN`, `MEDICO`, `PACIENTE`) e tratamento centralizado de erros de acesso negado e exceções gerais.
 
 ### 🚧 Fase 4 — Regras de Negócio (Em desenvolvimento)
 
-**Objetivo Técnico:**
+**O que já existe:**
+- Bloqueio de horário duplicado para o mesmo médico
+- Bloqueio de exclusão de médico/paciente com compromissos vinculados
 
-Implementar validações de domínio para garantir consistência dos dados e integridade das operações médicas.
-
-**O que será implementado:**
-
-- Bloqueio de conflitos de horário para consultas
-- Validação de disponibilidade do médico
+**O que falta:**
+- Validação de entrada com Bean Validation (`@Valid` + DTOs de request)
+- Permissões mais finas por ação (ex: MEDICO só visualizar, não excluir)
 - Limite de consultas por período
-- Regras para cancelamento e remarcação
-- Validação de entrada com DTOs
-- Uso de Bean Validation
-
-**Impacto Esperado no Sistema:**
-
-Maior confiabilidade das operações, redução de inconsistências e alinhamento com regras reais de um ambiente hospitalar.
-
-**Decisões Técnicas Planejadas:**
-
-- Uso de DTOs para separar camada externa do domínio
-- Centralização de regras na camada Service
-- Uso de exceptions customizadas para regras de negócio
-
-**O que ainda falta:**
-
-Implementação completa das regras de domínio e cenários de validação.
-
----
 
 ### ⏳ Fase 5 — Notificações (Pendente)
 
-**Objetivo Técnico:**
-
-Criar sistema de comunicação automática entre plataforma e usuários.
-
-**O que será implementado:**
-
-- Notificação ao criar consulta
-- Notificação ao remarcar consulta
-- Notificação ao cancelar consulta
-- Histórico interno de notificações
-- Futuro envio por e-mail
-
-**Impacto Esperado no Sistema:**
-
-Melhora na experiência do usuário, redução de faltas e comunicação mais eficiente.
-
-**Decisões Técnicas Planejadas:**
-
-- Arquitetura desacoplada para eventos
-- Possível uso de filas ou eventos assíncronos
-- Preparação para integração com serviços externos de e-mail
-
-**O que ainda falta:**
-
-Implementação completa da infraestrutura de notificações.
-
----
+Hoje `NotificacaoService` apenas imprime no console. Falta:
+- Persistência de histórico de notificações
+- Envio real por e-mail
 
 ### 🎨 Fase 7 — Front-end (Design concluído / Desenvolvimento pendente)
 
-**Objetivo Técnico:**
+Protótipos prontos no Figma; falta integração com a API.
 
-Criar interface visual para consumo da API e experiência completa do usuário.
-
-**O que já foi implementado:**
-
-- Prototipação completa das telas no Figma
-- Definição de fluxos de navegação
-- Estrutura visual dos dashboards por perfil
-- Tela de login desenhada
-
-**O que será implementado:**
-
-- Integração com API backend
-- Persistência de sessão
-- Consumo de endpoints autenticados
-- Dashboards funcionais:
-    - Admin
-    - Médico
-    - Paciente
-
-**Impacto Esperado no Sistema:**
-
-Transformação da API em produto utilizável por usuários finais.
-
-**Decisões Técnicas Planejadas:**
-
-- Integração com tecnologias front-end como React ou interface web tradicional
-- Consumo via API REST
-- Controle de rotas protegidas no front-end
-
-**O que ainda falta:**
-
-Implementação completa da interface e integração com backend.
+---
 
 ## Tela Inicial
 
 <img width="1249" height="707" alt="Captura de Tela (54)" src="https://github.com/user-attachments/assets/f11e1200-e398-4d83-bee7-c498714b6b9f" />
 
-## Tela Paciente 
+## Tela Paciente
 
 <img width="1481" height="837" alt="Captura de Tela (55)" src="https://github.com/user-attachments/assets/389b5e04-1135-4e17-adb8-8ebd6b8b5551" />
 
@@ -428,4 +272,3 @@ Implementação completa da interface e integração com backend.
 ## Tela Administrador
 
 <img width="1465" height="844" alt="Captura de Tela (58)" src="https://github.com/user-attachments/assets/a04c461a-b3b7-41a4-81d1-01a454caefe9" />
-
