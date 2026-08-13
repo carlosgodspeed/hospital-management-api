@@ -1,7 +1,7 @@
 package hospital.system.controller;
 
 import java.util.List;
-
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +23,7 @@ public class MedicoController {
         this.service = service;
     }
     @PostMapping
-    public ResponseEntity<Medico> criar(@RequestBody Medico medico) {
+    public ResponseEntity<Medico> criar(@Valid @RequestBody Medico medico) {
         return ResponseEntity.ok(service.salvar(medico));
     }
     @GetMapping
