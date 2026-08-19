@@ -2,6 +2,7 @@ package hospital.system.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -37,24 +38,30 @@ public class SecurityConfig {
                 exception.accessDeniedHandler(securityExceptionHandler)
             )
 
-            .authorizeHttpRequests(auth -> auth
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll()
 
-                .requestMatchers("/api/auth/**").permitAll()
+                        // Médicos: POST/DELETE só ADMIN; GET qualquer autenticado
+                        .requestMatchers(HttpMethod.POST, "/api/medicos/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/medicos/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/medicos/**").hasAnyRole("ADMIN", "MEDICO")
 
-                .requestMatchers("/api/usuarios/**")
-                .hasRole("ADMIN")
+                        // Pacientes: POST/DELETE só ADMIN; GET qualquer autenticado
+                        .requestMatchers(HttpMethod.POST, "/api/pacientes/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/pacientes/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/pacientes/**").hasAnyRole("ADMIN", "PACIENTE")
 
-                .requestMatchers("/api/medicos/**")
-                .hasAnyRole("ADMIN", "MEDICO")
+                        // Compromissos: POST (agendar) ADMIN/PACIENTE; GET qualquer autenticado; PUT status só MEDICO/ADMIN
+                        .requestMatchers(HttpMethod.POST, "/api/compromissos").hasAnyRole("ADMIN", "PACIENTE")
+                        .requestMatchers(HttpMethod.GET, "/api/compromissos/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/compromissos/**").hasAnyRole("ADMIN", "MEDICO")
+                        .requestMatchers(HttpMethod.DELETE, "/api/compromissos/**").hasAnyRole("ADMIN", "MEDICO")
 
-                .requestMatchers("/api/pacientes/**")
-                .hasAnyRole("ADMIN", "PACIENTE")
+                        // Usuários: só ADMIN
+                        .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
 
-                .requestMatchers("/api/compromissos/**")
-                .hasAnyRole("ADMIN", "MEDICO", "PACIENTE")
-
-                .anyRequest().authenticated()
-            )
+                        .anyRequest().authenticated()
+                )
 
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 

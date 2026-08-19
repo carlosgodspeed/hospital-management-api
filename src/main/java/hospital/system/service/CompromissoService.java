@@ -39,6 +39,22 @@ public class CompromissoService {
             );
         }
 
+        // Verificar se paciente já tem compromisso no mesmo horário
+        if (repository.existsByPacienteIdAndDataAndHora(
+                compromisso.getPaciente().getId(),
+                compromisso.getData(),
+                compromisso.getHora())) {
+            throw new IllegalStateException("Paciente já possui compromisso neste horário");
+        }
+
+        // Verificar se médico já tem 12 compromissos no mesmo dia
+        long compromissosDoMedico = repository.countByMedicoIdAndData(
+                compromisso.getMedico().getId(),
+                compromisso.getData());
+        if (compromissosDoMedico >= 12) {
+            throw new IllegalStateException("Médico atingiu o limite de 12 compromissos neste dia");
+        }
+
         return repository.save(compromisso);
     }
 

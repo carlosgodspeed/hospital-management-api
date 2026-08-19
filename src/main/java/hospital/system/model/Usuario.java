@@ -1,7 +1,9 @@
 package hospital.system.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -20,12 +22,16 @@ public class Usuario {
     private Long id;
 
     @Column(unique = true)
+    @NotBlank(message = "O username é obrigatório")
     private String username;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @NotBlank(message = "A senha é obrigatória")
+    @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres")
     private String password;
 
     @Enumerated(EnumType.STRING)
+    @NotNull(message = "A role é obrigatória")
     private Role role;
 
     public enum Role {

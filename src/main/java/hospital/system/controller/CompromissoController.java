@@ -3,7 +3,7 @@ package hospital.system.controller;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +26,7 @@ public class CompromissoController {
         this.service = service;
     }
     @PostMapping
-    public ResponseEntity<Compromisso> criar(@RequestBody Compromisso compromisso) {
+    public ResponseEntity<Compromisso> criar(@Valid @RequestBody Compromisso compromisso) {
         Compromisso salvo = service.salvarCompromisso(compromisso);
         return ResponseEntity.ok(salvo);
     }

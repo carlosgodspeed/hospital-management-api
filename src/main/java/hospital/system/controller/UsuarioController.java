@@ -1,5 +1,6 @@
 package hospital.system.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +22,7 @@ public class UsuarioController {
 
     // Criar usuário (senha é criptografada com BCrypt dentro do UsuarioService)
     @PostMapping
-    public ResponseEntity<Usuario> criar(@RequestBody Usuario usuario) {
+    public ResponseEntity<Usuario> criar(@Valid @RequestBody Usuario usuario) {
         return ResponseEntity.ok(service.salvar(usuario));
     }
 

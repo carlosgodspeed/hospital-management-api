@@ -2,7 +2,8 @@ package hospital.system.model;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Future;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -23,12 +24,20 @@ public class Compromisso {
 
     @ManyToOne
     @JoinColumn(name = "paciente_id", nullable = false)
+    @NotNull(message = "O paciente é obrigatório")
     private Paciente paciente;
 
     @ManyToOne
     @JoinColumn(name = "medico_id", nullable = false)
+
+    @NotNull(message = "O médico é obrigatório")
     private Medico medico;
+
+    @NotNull(message = "A data é obrigatória")
+    @Future(message = "A data deve ser no futuro")
     private LocalDate data;
+
+    @NotNull(message = "A hora é obrigatória")
     private LocalTime hora;
 
     public enum Status {

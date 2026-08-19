@@ -25,4 +25,8 @@ public interface CompromissoRepository extends JpaRepository<Compromisso, Long> 
     boolean existsByMedicoId(Long medicoId);
 
     boolean existsByPacienteId(Long pacienteId);
+
+    boolean existsByPacienteIdAndDataAndHora(Long pacienteId, LocalDate data, LocalTime hora);
+
+    long countByMedicoIdAndData(Long medicoId, LocalDate data);
 }
