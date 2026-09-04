@@ -40,10 +40,6 @@ Desenvolver uma plataforma robusta e escalável para gerenciamento de consultas 
 - MySQL 8.x
 - BCrypt para hash de senhas
 
-**Frontend (em desenvolvimento):**
-
-- Protótipos no Figma
-- Integração REST planejada
 
 ### Diferenciais do Projeto
 
@@ -52,7 +48,6 @@ Desenvolver uma plataforma robusta e escalável para gerenciamento de consultas 
 - Modelagem de domínio com relacionamentos JPA
 - API RESTful seguindo boas práticas
 - Tratamento de erros centralizado (`@RestControllerAdvice`)
-- Design system validado em protótipos Figma
 
 ---
 
@@ -72,6 +67,7 @@ hospital-management-api/
 │     │     │  ├─ AuthController.java
 │     │     │  ├─ CompromissoController.java
 │     │     │  ├─ MedicoController.java
+│     │     │  ├─ NotificacaoController.java
 │     │     │  ├─ PacienteController.java
 │     │     │  └─ UsuarioController.java
 │     │     ├─ dto/
@@ -82,12 +78,14 @@ hospital-management-api/
 │     │     ├─ model/
 │     │     │  ├─ Compromisso.java
 │     │     │  ├─ Medico.java
+│     │     │  ├─ Notificacao.java
 │     │     │  ├─ Paciente.java
 │     │     │  ├─ Role.java
 │     │     │  └─ Usuario.java
 │     │     ├─ repository/
 │     │     │  ├─ CompromissoRepository.java
 │     │     │  ├─ MedicoRepository.java
+│     │     │  ├─ NotificacaoRepository.java
 │     │     │  ├─ PacienteRepository.java
 │     │     │  └─ UsuarioRepository.java
 │     │     ├─ security/
@@ -144,6 +142,8 @@ hospital-management-api/
 - `GET /api/compromissos/paciente/{pacienteId}` — Buscar por paciente
 - `PUT /api/compromissos/{id}/status` — Atualizar status
 - `PUT /api/compromissos/{id}/remarcar` — Remarcar consulta
+- `GET /api/notificacoes/paciente/{pacienteId}` — Listar notificações de um paciente (mais recentes primeiro)
+- `PUT /api/notificacoes/{id}/lida` — Marcar notificação como lida
 
 ### Service Layer
 
@@ -151,8 +151,11 @@ hospital-management-api/
 
 **Implementado:**
 
-- Bloqueio de conflitos de horário (`existsByMedicoIdAndDataAndHora`)
-- Notificação (via log) ao remarcar ou mudar status de um compromisso
+- Bloqueio de conflitos de horário (`existsByMedicoIdAndDataAndHora`), tanto para o médico quanto para o paciente
+- Limite de 12 compromissos por médico no mesmo dia
+- Validação de entrada com Bean Validation (`@Valid` + anotações nas entidades), com erros formatados pelo `GlobalExceptionHandler`
+- Permissões por verbo HTTP (não só por recurso) via `SecurityConfig`
+- Notificação persistida no banco (`Notificacao`) ao remarcar ou mudar status de um compromisso
 - Proteção contra exclusão de médico/paciente com compromissos vinculados
 
 ### Repository Layer
@@ -181,6 +184,7 @@ hospital-management-api/
 | **Medico** | nome, especialidade | `@OneToOne` com Usuario |
 | **Paciente** | nome, email, telefone | `@OneToOne` com Usuario |
 | **Compromisso** | data, hora, status | `@ManyToOne` com Paciente e Medico |
+| **Notificacao** | mensagem, dataHora, lida | `@ManyToOne` com Paciente |
 
 ### Security Layer
 
@@ -195,15 +199,20 @@ hospital-management-api/
 
 **Controle de Acesso por recurso (`SecurityConfig`):**
 
-| Rota | ADMIN | MEDICO | PACIENTE |
-| --- | --- | --- | --- |
-| `/api/auth/**` | público | público | público |
-| `/api/usuarios/**` | ✓ | ✗ | ✗ |
-| `/api/medicos/**` | ✓ | ✓ | ✗ |
-| `/api/pacientes/**` | ✓ | ✗ | ✓ |
-| `/api/compromissos/**` | ✓ | ✓ | ✓ |
+| Rota | Verbo | ADMIN | MEDICO | PACIENTE |
+| --- | --- | --- | --- | --- |
+| `/api/auth/**` | qualquer | público | público | público |
+| `/api/usuarios/**` | qualquer | ✓ | ✗ | ✗ |
+| `/api/medicos/**` | GET | ✓ | ✓ | ✗ |
+| `/api/medicos/**` | POST / DELETE | ✓ | ✗ | ✗ |
+| `/api/pacientes/**` | GET | ✓ | ✗ | ✓ |
+| `/api/pacientes/**` | POST / DELETE | ✓ | ✗ | ✗ |
+| `/api/compromissos` | POST | ✓ | ✗ | ✓ |
+| `/api/compromissos/**` | GET | ✓ | ✓ | ✓ |
+| `/api/compromissos/**` | PUT / DELETE | ✓ | ✓ | ✗ |
+| `/api/notificacoes/**` | GET / PUT | ✓ | ✓ | ✓ |
 
-> A permissão hoje é por recurso, não por ação — por exemplo, um MEDICO pode criar e excluir médicos, não apenas visualizar. Refinar isso por verbo HTTP é um próximo passo natural (ver Fase 4).
+> A permissão já é por verbo HTTP (Fase 4), não mais por recurso inteiro. Ponto em aberto: `/api/notificacoes/paciente/{id}` não checa se o paciente autenticado é o dono daquele `id` — qualquer usuário autenticado pode consultar notificações de qualquer paciente trocando o id na URL. Essa falta de checagem de "dono do recurso" também existe hoje em `/api/pacientes/**` e não foi endereçada nesta fase.
 
 ---
 
@@ -217,6 +226,18 @@ O projeto passou por uma rodada de correção de bugs que impediam seu funcionam
 - **Endpoint de login duplicado e inacessível** em `/api/usuarios/login` foi removido; o login é centralizado em `/api/auth/login`.
 - **Tratamento de erros centralizado adicionado** (`GlobalExceptionHandler`), trocando stacktraces em respostas 500 por JSON de erro consistente.
 - **Segredos movidos para variáveis de ambiente** (`DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`), removendo credenciais fixas do código.
+- **Fase 4 concluída:** validação de entrada com Bean Validation, permissões refinadas por verbo HTTP em `SecurityConfig`, e limite de 12 compromissos por médico/dia.
+- **Fase 5 iniciada:** notificações agora são persistidas na tabela `notificacoes` (antes só logavam no console). Novos endpoints `GET /api/notificacoes/paciente/{id}` e `PUT /api/notificacoes/{id}/lida`.
+
+---
+
+## ⚠️ Bug conhecido — `@Future` bloqueia updates em compromissos com data passada
+
+O campo `data` em `Compromisso` usa `@Future`, que é revalidado **toda vez que a entidade é salva**, não só na criação. Isso significa que qualquer `PUT` (`/status` ou `/remarcar`) em um compromisso cuja data já passou falha com `400 - Could not commit JPA transaction`, porque a validação dispara de novo no update.
+
+**Impacto real:** depois que a data de uma consulta passa, não é mais possível marcar como `CONFIRMADO`/`CANCELADO` nem remarcar — o registro fica "congelado".
+
+**Correção pendente:** mover a validação de "data futura" para acontecer só na criação (checagem manual no `CompromissoService`, ou um DTO de request separado para criação), e remover o `@Future` da entidade em si.
 
 ---
 
@@ -234,41 +255,29 @@ Login via `/api/auth/login`, geração de JWT, senha com hash BCrypt e verifica�
 
 Spring Security + `JwtFilter` + controle de acesso por role (`ADMIN`, `MEDICO`, `PACIENTE`) e tratamento centralizado de erros de acesso negado e exceções gerais.
 
-### 🚧 Fase 4 — Regras de Negócio (Em desenvolvimento)
+### ✅ Fase 4 — Regras de Negócio (Concluído)
+
+- Bloqueio de horário duplicado para o mesmo médico e para o mesmo paciente
+- Bloqueio de exclusão de médico/paciente com compromissos vinculados
+- Validação de entrada com Bean Validation (`@Valid` nas entidades, erros formatados pelo `GlobalExceptionHandler`)
+- Permissões por verbo HTTP em `SecurityConfig` (ex: MEDICO só visualiza médicos, não cria/exclui)
+- Limite de 12 compromissos por médico por dia
+
+> Bug conhecido introduzido/exposto durante os testes desta fase: ver seção "Bug conhecido" acima sobre `@Future` em `Compromisso.data`.
+
+### 🚧 Fase 5 — Notificações (Em desenvolvimento)
 
 **O que já existe:**
-- Bloqueio de horário duplicado para o mesmo médico
-- Bloqueio de exclusão de médico/paciente com compromissos vinculados
+- Entidade `Notificacao` persistida na tabela `notificacoes`
+- Notificação criada automaticamente ao remarcar um compromisso ou alterar seu status
+- `GET /api/notificacoes/paciente/{pacienteId}` — histórico por paciente, mais recente primeiro
+- `PUT /api/notificacoes/{id}/lida` — marcar como lida
 
 **O que falta:**
-- Validação de entrada com Bean Validation (`@Valid` + DTOs de request)
-- Permissões mais finas por ação (ex: MEDICO só visualizar, não excluir)
-- Limite de consultas por período
+- Envio real por e-mail (`spring-boot-starter-mail` + `JavaMailSender`)
+- Notificar também na **criação** do compromisso (hoje só notifica em remarcação/mudança de status)
+- Notificar o **médico**, não só o paciente
+- Endpoint de contagem de não lidas (`.../nao-lidas/count`) para uso em UI
+- Checagem de "dono do recurso" (hoje qualquer autenticado lê notificações de qualquer paciente)
 
-### ⏳ Fase 5 — Notificações (Pendente)
-
-Hoje `NotificacaoService` apenas imprime no console. Falta:
-- Persistência de histórico de notificações
-- Envio real por e-mail
-
-### 🎨 Fase 7 — Front-end (Design concluído / Desenvolvimento pendente)
-
-Protótipos prontos no Figma; falta integração com a API.
-
----
-
-## Tela Inicial
-
-<img width="1249" height="707" alt="Captura de Tela (54)" src="https://github.com/user-attachments/assets/f11e1200-e398-4d83-bee7-c498714b6b9f" />
-
-## Tela Paciente
-
-<img width="1481" height="837" alt="Captura de Tela (55)" src="https://github.com/user-attachments/assets/389b5e04-1135-4e17-adb8-8ebd6b8b5551" />
-
-## Tela Medico
-
-<img width="1461" height="841" alt="Captura de Tela (56)" src="https://github.com/user-attachments/assets/a828e774-5f5a-4a4e-8af6-fadd2e8276d8" />
-
-## Tela Administrador
-
-<img width="1465" height="844" alt="Captura de Tela (58)" src="https://github.com/user-attachments/assets/a04c461a-b3b7-41a4-81d1-01a454caefe9" />
+### ⏳ Fase 6 — Front-end (Ainda não iniciado)
