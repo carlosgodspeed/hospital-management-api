@@ -57,6 +57,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/compromissos/**").hasAnyRole("ADMIN", "MEDICO")
                         .requestMatchers(HttpMethod.DELETE, "/api/compromissos/**").hasAnyRole("ADMIN", "MEDICO")
 
+                        // Notificações: GET (listar por paciente) e PUT (marcar como lida)
+                        // liberado pra ADMIN, MEDICO e PACIENTE (autenticado)
+                        .requestMatchers(HttpMethod.GET, "/api/notificacoes/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/notificacoes/**").authenticated()
+
                         // Usuários: só ADMIN
                         .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
 

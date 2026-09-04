@@ -12,7 +12,7 @@ import hospital.system.repository.CompromissoRepository;
 
 @Service
 public class CompromissoService {
-
+ 
     private final CompromissoRepository repository;
     private final NotificacaoService notificacaoService;
 
@@ -87,7 +87,7 @@ public class CompromissoService {
             Compromisso atualizado = repository.save(c);
 
             notificacaoService.notificarPaciente(
-                    c.getPaciente().getNome(),
+                    c.getPaciente().getId(),
                     "Seu compromisso foi remarcado para "
                             + novaData + " às " + novaHora
             );
@@ -111,7 +111,7 @@ public class CompromissoService {
             Compromisso atualizado = repository.save(c);
 
             notificacaoService.notificarPaciente(
-                    c.getPaciente().getNome(),
+                    c.getPaciente().getId(),
                     "O status do seu compromisso foi alterado para " + status
             );
 
