@@ -14,18 +14,16 @@ public class NotificacaoService {
 
     private final NotificacaoRepository notificacaoRepository;
     private final PacienteRepository pacienteRepository;
+    private final EmailService emailService;
 
     public NotificacaoService(NotificacaoRepository notificacaoRepository,
-                              PacienteRepository pacienteRepository) {
+                              PacienteRepository pacienteRepository,
+                              EmailService emailService) {
         this.notificacaoRepository = notificacaoRepository;
         this.pacienteRepository = pacienteRepository;
+        this.emailService = emailService;
     }
 
-    /**
-     * Cria e persiste uma notificação para um paciente.
-     * Mantém o log no console (não remove nada que já funcionava),
-     * mas agora também grava a notificação na tabela `notificacoes`.
-     */
     public Notificacao notificarPaciente(Long pacienteId, String mensagem) {
         Paciente paciente = pacienteRepository.findById(pacienteId)
                 .orElseThrow(() -> new RuntimeException("Paciente não encontrado"));
@@ -37,6 +35,12 @@ public class NotificacaoService {
         Notificacao salva = notificacaoRepository.save(notificacao);
 
         System.out.println("Notificação para " + paciente.getNome() + ": " + mensagem);
+
+        emailService.enviarEmail(
+                paciente.getEmail(),
+                "Hospital Management - Atualização sobre seu compromisso",
+                mensagem
+        );
 
         return salva;
     }

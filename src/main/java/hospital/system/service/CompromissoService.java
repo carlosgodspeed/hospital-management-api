@@ -12,7 +12,7 @@ import hospital.system.repository.CompromissoRepository;
 
 @Service
 public class CompromissoService {
- 
+
     private final CompromissoRepository repository;
     private final NotificacaoService notificacaoService;
 
@@ -25,6 +25,10 @@ public class CompromissoService {
     }
 
     public Compromisso salvarCompromisso(Compromisso compromisso) {
+
+        if (compromisso.getData() != null && !compromisso.getData().isAfter(LocalDate.now())) {
+            throw new RuntimeException("A data do compromisso deve ser no futuro");
+        }
 
         boolean horarioOcupado =
                 repository.existsByMedicoIdAndDataAndHora(
@@ -74,6 +78,10 @@ public class CompromissoService {
             Long id,
             LocalDate novaData,
             LocalTime novaHora) {
+
+        if (novaData != null && !novaData.isAfter(LocalDate.now())) {
+            throw new RuntimeException("A nova data do compromisso deve ser no futuro");
+        }
 
         Optional<Compromisso> opt = repository.findById(id);
 

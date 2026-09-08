@@ -3,7 +3,6 @@ package hospital.system.model;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Future;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -34,7 +33,6 @@ public class Compromisso {
     private Medico medico;
 
     @NotNull(message = "A data é obrigatória")
-    @Future(message = "A data deve ser no futuro")
     private LocalDate data;
 
     @NotNull(message = "A hora é obrigatória")
