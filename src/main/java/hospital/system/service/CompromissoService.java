@@ -36,11 +36,6 @@ public class CompromissoService {
 
     public Compromisso salvarCompromisso(Compromisso compromisso) {
 
-        // Validação de "data futura" feita aqui manualmente (e não via @Future
-        // na entidade) porque o Hibernate revalida a entidade inteira em TODO
-        // save(), inclusive em updates de status/remarcação. Se ficasse na
-        // entidade, um compromisso cuja data já passou nunca mais poderia ter
-        // o status alterado (ver bug documentado no Readme).
         if (compromisso.getData() != null && !compromisso.getData().isAfter(LocalDate.now())) {
             throw new RuntimeException("A data do compromisso deve ser no futuro");
         }
@@ -58,7 +53,6 @@ public class CompromissoService {
             );
         }
 
-        // Verificar se paciente já tem compromisso no mesmo horário
         if (repository.existsByPacienteIdAndDataAndHora(
                 compromisso.getPaciente().getId(),
                 compromisso.getData(),
@@ -76,10 +70,6 @@ public class CompromissoService {
 
         Compromisso salvo = repository.save(compromisso);
 
-        // Busca as entidades completas no banco para montar as mensagens de
-        // notificação com nome de verdade. O objeto "salvo" só tem os campos
-        // que o cliente mandou no corpo da requisição (normalmente só o id),
-        // então salvo.getMedico().getNome() viria null se usássemos direto.
         Paciente pacienteCompleto = pacienteRepository.findById(salvo.getPaciente().getId())
                 .orElseThrow(() -> new RuntimeException("Paciente não encontrado"));
         Medico medicoCompleto = medicoRepository.findById(salvo.getMedico().getId())
