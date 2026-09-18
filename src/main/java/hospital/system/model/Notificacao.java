@@ -21,9 +21,12 @@ public class Notificacao {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "paciente_id", nullable = false)
-    @NotNull(message = "O paciente é obrigatório")
+    @JoinColumn(name = "paciente_id", nullable = true)
     private Paciente paciente;
+
+    @ManyToOne
+    @JoinColumn(name = "medico_id", nullable = true)
+    private Medico medico;
 
     @NotBlank(message = "A mensagem é obrigatória")
     private String mensagem;
@@ -40,6 +43,9 @@ public class Notificacao {
 
     public Paciente getPaciente() { return paciente; }
     public void setPaciente(Paciente paciente) { this.paciente = paciente; }
+
+    public Medico getMedico() { return medico; }
+    public void setMedico(Medico medico) { this.medico = medico; }
 
     public String getMensagem() { return mensagem; }
     public void setMensagem(String mensagem) { this.mensagem = mensagem; }

@@ -11,4 +11,10 @@ import hospital.system.model.Notificacao;
 public interface NotificacaoRepository extends JpaRepository<Notificacao, Long> {
 
     List<Notificacao> findByPacienteIdOrderByDataHoraDesc(Long pacienteId);
+
+    List<Notificacao> findByMedicoIdOrderByDataHoraDesc(Long medicoId);
+
+    long countByPacienteIdAndLidaFalse(Long pacienteId);
+
+    long countByMedicoIdAndLidaFalse(Long medicoId);
 }

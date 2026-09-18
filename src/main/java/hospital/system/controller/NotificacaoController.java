@@ -1,6 +1,7 @@
 package hospital.system.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,8 +28,23 @@ public class NotificacaoController {
         return ResponseEntity.ok(service.listarPorPaciente(pacienteId));
     }
 
+    @GetMapping("/medico/{medicoId}")
+    public ResponseEntity<List<Notificacao>> listarPorMedico(@PathVariable Long medicoId) {
+        return ResponseEntity.ok(service.listarPorMedico(medicoId));
+    }
+
     @PutMapping("/{id}/lida")
     public ResponseEntity<Notificacao> marcarComoLida(@PathVariable Long id) {
         return ResponseEntity.ok(service.marcarComoLida(id));
+    }
+
+    @GetMapping("/paciente/{pacienteId}/nao-lidas/count")
+    public ResponseEntity<Map<String, Long>> contarNaoLidasPaciente(@PathVariable Long pacienteId) {
+        return ResponseEntity.ok(Map.of("naoLidas", service.contarNaoLidasPorPaciente(pacienteId)));
+    }
+
+    @GetMapping("/medico/{medicoId}/nao-lidas/count")
+    public ResponseEntity<Map<String, Long>> contarNaoLidasMedico(@PathVariable Long medicoId) {
+        return ResponseEntity.ok(Map.of("naoLidas", service.contarNaoLidasPorMedico(medicoId)));
     }
 }
