@@ -11,43 +11,21 @@
 
 ### Objetivo do Sistema
 
-Desenvolver uma plataforma robusta e escalável para gerenciamento de consultas médicas, integrando gestão de pacientes, médicos e administradores em um único sistema com controle granular de permissões e fluxos otimizados de agendamento.
-
-### Problema que Resolve
-
-- **Conflitos de horário** em agendamentos manuais
-- **Falta de controle centralizado** sobre disponibilidade de médicos
-- **Ausência de rastreabilidade** em cancelamentos e remarcações
-- **Dificuldade de acesso** a informações por diferentes perfis de usuário
-- **Processos manuais** suscetíveis a erros humanos
+Plataforma para gerenciamento de consultas médicas, integrando gestão de pacientes, médicos e administradores em um único sistema com controle de permissões por perfil e fluxos de agendamento.
 
 ### Público-Alvo
 
 | Perfil | Necessidades | Acesso |
 | --- | --- | --- |
-| **Administrador** | Gestão completa do sistema, criação de usuários, relatórios | Total |
-| **Médico** | Visualizar agenda, confirmar consultas, acessar histórico | Dados próprios + pacientes atendidos |
-| **Paciente** | Agendar consultas, visualizar histórico, remarcar/cancelar | Dados pessoais apenas |
+| **Administrador** | Gestão completa do sistema, criação de usuários | Total |
+| **Médico** | Visualizar agenda, confirmar/cancelar consultas | Dados próprios + pacientes atendidos |
+| **Paciente** | Agendar consultas, visualizar histórico | Dados pessoais apenas |
 
-### Tecnologias Utilizadas
+### Tecnologias
 
-**Backend:**
+**Backend:** Java 17 · Spring Boot 3.2.5 · Spring Data JPA (Hibernate) · Spring Security + JWT (jjwt) · MySQL 8 · BCrypt
 
-- Java 17
-- Spring Boot 3.2.5
-- Spring Data JPA (Hibernate)
-- Spring Security + JWT (jjwt)
-- MySQL 8.x
-- BCrypt para hash de senhas
-
-
-### Diferenciais do Projeto
-
-- Arquitetura em camadas bem definida
-- Sistema de autorização baseado em perfis
-- Modelagem de domínio com relacionamentos JPA
-- API RESTful seguindo boas práticas
-- Tratamento de erros centralizado (`@RestControllerAdvice`)
+**Frontend:** React (JavaScript) + Vite, em repositório separado: [hospital-management-frontend](https://github.com/carlosgodspeed/Hospital-Managmenet-API---FRONT-END)
 
 ---
 
@@ -59,149 +37,89 @@ hospital-management-api/
 │  └─ schema.sql
 ├─ src/
 │  └─ main/
-│     ├─ java/
-│     │  └─ hospital/system/
-│     │     ├─ config/
-│     │     │  └─ DataInitializer.java
-│     │     ├─ controller/
-│     │     │  ├─ AuthController.java
-│     │     │  ├─ CompromissoController.java
-│     │     │  ├─ MedicoController.java
-│     │     │  ├─ NotificacaoController.java
-│     │     │  ├─ PacienteController.java
-│     │     │  └─ UsuarioController.java
-│     │     ├─ dto/
-│     │     │  ├─ LoginRequest.java
-│     │     │  └─ LoginResponse.java
-│     │     ├─ exception/
-│     │     │  └─ GlobalExceptionHandler.java
-│     │     ├─ model/
-│     │     │  ├─ Compromisso.java
-│     │     │  ├─ Medico.java
-│     │     │  ├─ Notificacao.java
-│     │     │  ├─ Paciente.java
-│     │     │  ├─ Role.java
-│     │     │  └─ Usuario.java
-│     │     ├─ repository/
-│     │     │  ├─ CompromissoRepository.java
-│     │     │  ├─ MedicoRepository.java
-│     │     │  ├─ NotificacaoRepository.java
-│     │     │  ├─ PacienteRepository.java
-│     │     │  └─ UsuarioRepository.java
-│     │     ├─ security/
-│     │     │  ├─ JwtFilter.java
-│     │     │  ├─ JwtUtil.java
-│     │     │  ├─ SecurityConfig.java
-│     │     │  └─ SecurityExceptionHandler.java
-│     │     ├─ service/
-│     │     │  ├─ AuthService.java
-│     │     │  ├─ CompromissoService.java
-│     │     │  ├─ MedicoService.java
-│     │     │  ├─ NotificacaoService.java
-│     │     │  ├─ PacienteService.java
-│     │     │  └─ UsuarioService.java
-│     │     └─ HospitalManagementApplication.java
+│     ├─ java/hospital/system/
+│     │  ├─ config/
+│     │  │  └─ DataInitializer.java
+│     │  ├─ controller/
+│     │  │  ├─ AuthController.java
+│     │  │  ├─ CompromissoController.java
+│     │  │  ├─ MedicoController.java
+│     │  │  ├─ NotificacaoController.java
+│     │  │  ├─ PacienteController.java
+│     │  │  └─ UsuarioController.java
+│     │  ├─ dto/
+│     │  │  ├─ LoginRequest.java
+│     │  │  └─ LoginResponse.java
+│     │  ├─ exception/
+│     │  │  └─ GlobalExceptionHandler.java
+│     │  ├─ model/
+│     │  │  ├─ Compromisso.java
+│     │  │  ├─ Medico.java
+│     │  │  ├─ Notificacao.java
+│     │  │  ├─ Paciente.java
+│     │  │  ├─ Role.java
+│     │  │  └─ Usuario.java
+│     │  ├─ repository/
+│     │  │  ├─ CompromissoRepository.java
+│     │  │  ├─ MedicoRepository.java
+│     │  │  ├─ NotificacaoRepository.java
+│     │  │  ├─ PacienteRepository.java
+│     │  │  └─ UsuarioRepository.java
+│     │  ├─ security/
+│     │  │  ├─ JwtFilter.java
+│     │  │  ├─ JwtUtil.java
+│     │  │  ├─ SecurityConfig.java
+│     │  │  └─ SecurityExceptionHandler.java
+│     │  ├─ service/
+│     │  │  ├─ AuthService.java
+│     │  │  ├─ CompromissoService.java
+│     │  │  ├─ EmailService.java
+│     │  │  ├─ MedicoService.java
+│     │  │  ├─ NotificacaoService.java
+│     │  │  ├─ PacienteService.java
+│     │  │  └─ UsuarioService.java
+│     │  └─ HospitalManagementApplication.java
 │     └─ resources/
 │        └─ application.properties
 └─ pom.xml
 ```
 
-## Arquitetura Técnica
-
-### Arquitetura em Camadas
+## Arquitetura em Camadas
 
 ```
-┌─────────────────────────────────────────┐
-│           Controller Layer              │  ← Endpoints REST
-├─────────────────────────────────────────┤
-│            Service Layer                │  ← Lógica de negócio
-├─────────────────────────────────────────┤
-│          Repository Layer               │  ← Acesso a dados (JPA)
-├─────────────────────────────────────────┤
-│            Entity Layer                 │  ← Modelo de domínio
-├─────────────────────────────────────────┤
-│          Security Layer                 │  ← Autenticação/Autorização
-└─────────────────────────────────────────┘
-                    ↓
-              MySQL Database
+Controller → Service → Repository → Entity
+                ↑
+            Security (JWT + roles)
 ```
 
-### Controller Layer
-
-**Responsabilidade:** Expor endpoints REST, validar entradas, retornar respostas HTTP adequadas.
-
-**Endpoints principais:**
+### Endpoints principais
 
 - `POST /api/auth/login` — Login e geração de token JWT
 - `POST /api/usuarios` — Criar usuário (ADMIN)
-- `POST /api/medicos` · `GET /api/medicos` · `GET /api/medicos/{id}` · `DELETE /api/medicos/{id}`
-- `POST /api/pacientes` · `GET /api/pacientes` · `GET /api/pacientes/{id}` · `DELETE /api/pacientes/{id}`
-- `POST /api/compromissos` — Criar consulta
-- `GET /api/compromissos` — Listar todas
-- `GET /api/compromissos/medico/{medicoId}?data=` — Buscar por médico e data
-- `GET /api/compromissos/paciente/{pacienteId}` — Buscar por paciente
-- `PUT /api/compromissos/{id}/status` — Atualizar status
-- `PUT /api/compromissos/{id}/remarcar` — Remarcar consulta
-- `GET /api/notificacoes/paciente/{pacienteId}` — Listar notificações de um paciente (mais recentes primeiro)
-- `PUT /api/notificacoes/{id}/lida` — Marcar notificação como lida
+- `GET/POST/DELETE /api/medicos/**` — CRUD de médicos (ADMIN cria/exclui; ADMIN e MEDICO visualizam)
+- `GET/POST/DELETE /api/pacientes/**` — CRUD de pacientes (ADMIN cria/exclui; ADMIN e PACIENTE visualizam)
+- `POST /api/compromissos` — Criar consulta (notifica paciente e médico)
+- `GET /api/compromissos` · `GET /api/compromissos/medico/{id}?data=` · `GET /api/compromissos/paciente/{id}`
+- `PUT /api/compromissos/{id}/status` — Atualizar status (ADMIN/MEDICO apenas; notifica paciente)
+- `PUT /api/compromissos/{id}/remarcar` — Remarcar consulta (notifica paciente)
+- `GET /api/notificacoes/paciente/{id}` · `GET /api/notificacoes/medico/{id}` — Listar notificações
+- `PUT /api/notificacoes/{id}/lida` — Marcar como lida
+- `GET /api/notificacoes/paciente/{id}/nao-lidas/count` · `GET /api/notificacoes/medico/{id}/nao-lidas/count`
 
-### Service Layer
-
-**Responsabilidade:** Implementar regras de negócio, orquestrar operações, validar consistência de dados.
-
-**Implementado:**
-
-- Bloqueio de conflitos de horário (`existsByMedicoIdAndDataAndHora`), tanto para o médico quanto para o paciente
-- Limite de 12 compromissos por médico no mesmo dia
-- Validação de entrada com Bean Validation (`@Valid` + anotações nas entidades), com erros formatados pelo `GlobalExceptionHandler`
-- Permissões por verbo HTTP (não só por recurso) via `SecurityConfig`
-- Notificação persistida no banco (`Notificacao`) ao remarcar ou mudar status de um compromisso
-- Proteção contra exclusão de médico/paciente com compromissos vinculados
-
-### Repository Layer
-
-- `PacienteRepository`
-- `MedicoRepository`
-- `CompromissoRepository`
-- `UsuarioRepository`
-
-**Queries customizadas:**
-
-- Busca por médico e data
-- Busca por paciente
-- Verificação de horário ocupado
-- Verificação de vínculo com compromissos (para exclusão segura)
-
-### Entity Layer
-
-**Responsabilidade:** Modelagem do domínio com relacionamentos JPA.
-
-**Entidades principais:**
+### Entidades
 
 | Entidade | Atributos Chave | Relacionamentos |
 | --- | --- | --- |
 | **Usuario** | username (único), password (BCrypt), role | — |
 | **Medico** | nome, especialidade | `@OneToOne` com Usuario |
 | **Paciente** | nome, email, telefone | `@OneToOne` com Usuario |
-| **Compromisso** | data, hora, status | `@ManyToOne` com Paciente e Medico |
-| **Notificacao** | mensagem, dataHora, lida | `@ManyToOne` com Paciente |
+| **Compromisso** | data, hora, status (`AGENDADO`/`CONFIRMADO`/`CANCELADO`) | `@ManyToOne` com Paciente e Medico |
+| **Notificacao** | mensagem, dataHora, lida | `@ManyToOne` com Paciente **OU** Medico (nunca os dois — regra em código, sem CHECK no banco) |
 
-### Security Layer
-
-**Fluxo de Autenticação:**
-
-1. Cliente envia credenciais para `POST /api/auth/login`
-2. Sistema valida a senha com `PasswordEncoder.matches()` (BCrypt)
-3. Token JWT é gerado e retornado
-4. Cliente inclui o token (`Authorization: Bearer <token>`) em requisições subsequentes
-5. `JwtFilter` valida o token e popula o contexto de segurança com a role do usuário
-6. `SecurityConfig` concede ou nega acesso com base na role
-
-**Controle de Acesso por recurso (`SecurityConfig`):**
+### Controle de Acesso por verbo HTTP
 
 | Rota | Verbo | ADMIN | MEDICO | PACIENTE |
 | --- | --- | --- | --- | --- |
-| `/api/auth/**` | qualquer | público | público | público |
 | `/api/usuarios/**` | qualquer | ✓ | ✗ | ✗ |
 | `/api/medicos/**` | GET | ✓ | ✓ | ✗ |
 | `/api/medicos/**` | POST / DELETE | ✓ | ✗ | ✗ |
@@ -212,72 +130,78 @@ hospital-management-api/
 | `/api/compromissos/**` | PUT / DELETE | ✓ | ✓ | ✗ |
 | `/api/notificacoes/**` | GET / PUT | ✓ | ✓ | ✓ |
 
-> A permissão já é por verbo HTTP (Fase 4), não mais por recurso inteiro. Ponto em aberto: `/api/notificacoes/paciente/{id}` não checa se o paciente autenticado é o dono daquele `id` — qualquer usuário autenticado pode consultar notificações de qualquer paciente trocando o id na URL. Essa falta de checagem de "dono do recurso" também existe hoje em `/api/pacientes/**` e não foi endereçada nesta fase.
+**CORS:** liberado para `http://localhost:5173` (front-end), via `corsConfigurationSource()` em `SecurityConfig`.
+
+> **Ponto em aberto:** nenhuma rota checa se o usuário autenticado é "dono" do recurso (ex: paciente A consegue ver notificações do paciente B só trocando o id na URL). Não endereçado ainda.
 
 ---
 
-## 🛠️ Changelog — correções recentes
+## 🐛 Bugs corrigidos
 
-O projeto passou por uma rodada de correção de bugs que impediam seu funcionamento:
-
-- **Login nunca autenticava.** A senha era comparada em texto puro contra o hash BCrypt salvo no banco. Corrigido para usar `PasswordEncoder.matches()`.
-- **Criação de usuário sempre falhava com `rawPassword cannot be null`.** O campo `password` em `Usuario` usava `@JsonIgnore`, que bloqueia tanto a saída quanto a entrada de dados — a senha nunca chegava ao servidor. Trocado por `@JsonProperty(access = WRITE_ONLY)`.
-- **Exclusão de médico/paciente com compromisso vinculado quebrava o sistema** (`JpaObjectRetrievalFailureException`). Agora bloqueada com validação que retorna `409 Conflict` e mensagem clara.
-- **Endpoint de login duplicado e inacessível** em `/api/usuarios/login` foi removido; o login é centralizado em `/api/auth/login`.
-- **Tratamento de erros centralizado adicionado** (`GlobalExceptionHandler`), trocando stacktraces em respostas 500 por JSON de erro consistente.
-- **Segredos movidos para variáveis de ambiente** (`DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`), removendo credenciais fixas do código.
-- **Fase 4 concluída:** validação de entrada com Bean Validation, permissões refinadas por verbo HTTP em `SecurityConfig`, e limite de 12 compromissos por médico/dia.
-- **Fase 5 iniciada:** notificações agora são persistidas na tabela `notificacoes` (antes só logavam no console). Novos endpoints `GET /api/notificacoes/paciente/{id}` e `PUT /api/notificacoes/{id}/lida`.
+- **`@Future` travava updates em compromissos passados.** Era revalidado em todo `save()`, não só na criação — bloqueava `PUT /status` em consultas já ocorridas. Corrigido: validação de "data futura" movida para checagem manual em `CompromissoService`, só na criação/remarcação.
+- **Login não autenticava** (comparação de senha em texto puro) — corrigido com `PasswordEncoder.matches()`.
+- **Criação de usuário falhava** (`@JsonIgnore` bloqueava entrada da senha) — trocado por `@JsonProperty(access = WRITE_ONLY)`.
+- **Exclusão de médico/paciente vinculado quebrava o sistema** — agora bloqueada com `409 Conflict`.
 
 ---
 
-## ⚠️ Bug conhecido — `@Future` bloqueia updates em compromissos com data passada
+## 🗺️ Roadmap
 
-O campo `data` em `Compromisso` usa `@Future`, que é revalidado **toda vez que a entidade é salva**, não só na criação. Isso significa que qualquer `PUT` (`/status` ou `/remarcar`) em um compromisso cuja data já passou falha com `400 - Could not commit JPA transaction`, porque a validação dispara de novo no update.
+### ✅ Concluído
 
-**Impacto real:** depois que a data de uma consulta passa, não é mais possível marcar como `CONFIRMADO`/`CANCELADO` nem remarcar — o registro fica "congelado".
+- **Fase 1** — CRUD completo de Paciente, Médico, Usuário e Compromisso
+- **Fase 2** — Autenticação JWT + BCrypt
+- **Fase 3** — Autorização por role
+- **Fase 4** — Validação de entrada, permissões por verbo HTTP, limite de 12 compromissos/médico/dia
+- **Fase 5** — Notificações persistidas no banco (Paciente e Médico), e-mail simulado, contagem de não lidas
+- **CORS** configurado para o front-end
 
-**Correção pendente:** mover a validação de "data futura" para acontecer só na criação (checagem manual no `CompromissoService`, ou um DTO de request separado para criação), e remover o `@Future` da entidade em si.
+### 🔜 Próxima fase — back-end precisa crescer junto com o front-end
+
+O front-end (ver roadmap dele) ganhou uma lista grande de funcionalidades novas que **dependem de mudanças aqui no back-end** antes de poderem ser construídas na tela. Nada disso está implementado ainda — é o planejamento pra próxima sessão:
+
+**1. Paciente cancelar a própria consulta**
+Hoje `PUT /api/compromissos/{id}/status` é restrito a `ADMIN`/`MEDICO`. Precisa de uma regra nova que permita o `PACIENTE` cancelar (nunca confirmar) uma consulta que seja dele mesmo — isso exige também checar "dono do recurso" (ver ponto em aberto acima), não só a role.
+
+**2. Fluxo de solicitação → aprovação de consulta**
+Hoje toda consulta criada já nasce `AGENDADO`. A ideia nova: o paciente **solicita** um horário, e o médico **aprova ou recusa**. Isso precisa de:
+- Um novo estado no `enum Status` (ex: `SOLICITADO`, antes de `AGENDADO`)
+- Um endpoint de aprovação/recusa restrito ao médico dono daquela consulta
+- Repensar quem pode chamar `POST /api/compromissos` e com qual status inicial
+
+**3. Prontuário médico (anexos: fotos, laudos, exames, anotações, receitas, remédios)**
+A maior peça nova. Precisa de:
+- Uma entidade nova (ex: `RegistroMedico` ou `Anexo`) com tipo (`FOTO`, `LAUDO`, `EXAME`, `ANOTACAO`, `RECEITA`, `REMEDIO`), vínculo com Paciente e com o Médico que criou, data, e o arquivo em si
+- Endpoint de upload (`multipart/form-data`) e de listagem por paciente
+- **Decisão pendente:** onde guardar os arquivos — sistema de arquivos local (simples, mas não escala) vs. serviço de storage (S3 ou similar)
+- Regra de acesso: médico só anexa/vê de seus próprios pacientes; paciente só vê os próprios
+
+**4. Perfil do usuário com foto e dados de contato**
+- Campo de foto de perfil (caminho/URL) em `Paciente` e `Medico`
+- `Medico` ainda não tem telefone — avaliar se deve ganhar
+- Endpoint de atualização do próprio perfil (`PUT /api/pacientes/me`, `/api/medicos/me`)
+
+**5. Endpoint `/api/me`**
+Hoje o login devolve só o `id` do `Usuario`, não o `id` do `Paciente`/`Medico` vinculado. O front-end contorna isso com um workaround (ver Readme do front-end). Um endpoint `/api/me` que devolva o perfil completo do usuário logado eliminaria essa gambiarra e destrava os itens 1 e 4 de forma mais limpa.
+
+> O item "Admin cadastrar médicos e pacientes pela interface" **não precisa de nada novo aqui** — `POST /api/medicos` e `POST /api/pacientes` já existem e já são restritos a `ADMIN`. A lacuna é só no front-end (ver o Readme dele).
 
 ---
 
-## 🗺️ Roadmap Técnico Detalhado
+## 📸 Capturas de tela
 
-### ✅ Fase 1 — Base do Sistema (Concluído)
+### Tela de Login
 
-CRUD completo de Paciente, Médico, Usuario e Compromisso, com relacionamentos JPA e queries customizadas (busca por médico/data, por paciente, verificação de horário ocupado).
+<img src="https://github.com/user-attachments/assets/3f2083aa-ee42-4781-847a-a853d76816f5" width="600"/>
 
-### ✅ Fase 2 — Autenticação (Concluído)
+### Dashboard (Admin)
 
-Login via `/api/auth/login`, geração de JWT, senha com hash BCrypt e verificação via `PasswordEncoder.matches()`.
+<img src="https://github.com/user-attachments/assets/2a8ec3ff-5f00-4f13-ab88-65a96c8842d1" width="600" />
 
-### ✅ Fase 3 — Autorização e Segurança (Concluído)
+### Tela de Consultas
 
-Spring Security + `JwtFilter` + controle de acesso por role (`ADMIN`, `MEDICO`, `PACIENTE`) e tratamento centralizado de erros de acesso negado e exceções gerais.
+<img src="https://github.com/user-attachments/assets/4b2cd7ad-d342-4a66-b4db-2848fb4d860a" width="600" />
 
-### ✅ Fase 4 — Regras de Negócio (Concluído)
+### Tela de Notificações
 
-- Bloqueio de horário duplicado para o mesmo médico e para o mesmo paciente
-- Bloqueio de exclusão de médico/paciente com compromissos vinculados
-- Validação de entrada com Bean Validation (`@Valid` nas entidades, erros formatados pelo `GlobalExceptionHandler`)
-- Permissões por verbo HTTP em `SecurityConfig` (ex: MEDICO só visualiza médicos, não cria/exclui)
-- Limite de 12 compromissos por médico por dia
-
-> Bug conhecido introduzido/exposto durante os testes desta fase: ver seção "Bug conhecido" acima sobre `@Future` em `Compromisso.data`.
-
-### 🚧 Fase 5 — Notificações (Em desenvolvimento)
-
-**O que já existe:**
-- Entidade `Notificacao` persistida na tabela `notificacoes`
-- Notificação criada automaticamente ao remarcar um compromisso ou alterar seu status
-- `GET /api/notificacoes/paciente/{pacienteId}` — histórico por paciente, mais recente primeiro
-- `PUT /api/notificacoes/{id}/lida` — marcar como lida
-
-**O que falta:**
-- Envio real por e-mail (`spring-boot-starter-mail` + `JavaMailSender`)
-- Notificar também na **criação** do compromisso (hoje só notifica em remarcação/mudança de status)
-- Notificar o **médico**, não só o paciente
-- Endpoint de contagem de não lidas (`.../nao-lidas/count`) para uso em UI
-- Checagem de "dono do recurso" (hoje qualquer autenticado lê notificações de qualquer paciente)
-
-### ⏳ Fase 6 — Front-end (Ainda não iniciado)
+<img src="https://github.com/user-attachments/assets/30db8a25-4320-4950-be8a-d562974c6de5" width="600" />
